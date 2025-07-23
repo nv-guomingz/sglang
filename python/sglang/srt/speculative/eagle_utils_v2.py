@@ -66,6 +66,7 @@ class EagleDraftInput:
     verify_done: torch.cuda.Event = None
 
     def filter_batch(self, new_indices: torch.Tensor):
+        return
         self.topk_p = self.topk_p[: len(new_indices)]
         self.topk_index = self.topk_index[: len(new_indices)]
         self.hidden_states = self.hidden_states[: len(new_indices)]

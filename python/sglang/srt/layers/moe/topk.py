@@ -451,6 +451,11 @@ def biased_grouped_topk_impl(
     return topk_weights, topk_ids
 
 
+biased_grouped_topk_impl_compiled = torch.compile(
+    biased_grouped_topk_impl, dynamic=True, backend=get_compiler_backend()
+)
+
+
 def is_power_of_two(n):
     return n > 0 and math.log2(n).is_integer()
 
@@ -536,11 +541,7 @@ def biased_grouped_topk_gpu(
         return topk_weights, topk_ids
     else:
         biased_grouped_topk_fn = (
-            torch.compile(
-                biased_grouped_topk_impl, dynamic=True, backend=get_compiler_backend()
-            )
-            if compiled
-            else biased_grouped_topk_impl
+            biased_grouped_topk_impl_compiled if compiled else biased_grouped_topk_impl
         )
         return biased_grouped_topk_fn(
             hidden_states,

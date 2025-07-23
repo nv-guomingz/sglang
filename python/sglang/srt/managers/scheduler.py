@@ -1826,6 +1826,10 @@ class Scheduler(
         """Update the current running decoding batch."""
         initial_bs = batch.batch_size()
 
+        # We need this to get the correct self.seq_lens
+        if batch.verify_done is not None:
+            batch.verify_done.synchronize()
+
         batch.filter_batch()
         if batch.is_empty():
             batch.batch_is_full = False

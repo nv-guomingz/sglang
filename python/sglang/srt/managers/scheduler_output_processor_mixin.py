@@ -89,12 +89,12 @@ class SchedulerOutputProcessorMixin:
                     req.output_ids.append(next_token_id)
                     req.check_finished()
 
-                    if req.finished():
-                        self.tree_cache.cache_finished_req(req)
-                        req.time_stats.completion_time = time.time()
-                    elif not batch.decoding_reqs or req not in batch.decoding_reqs:
-                        # This updates radix so others can match
-                        self.tree_cache.cache_unfinished_req(req)
+                    # if req.finished():
+                    #    self.tree_cache.cache_finished_req(req)
+                    #    req.time_stats.completion_time = time.time()
+                    # elif not batch.decoding_reqs or req not in batch.decoding_reqs:
+                    #    # This updates radix so others can match
+                    #    self.tree_cache.cache_unfinished_req(req)
 
                     if req.return_logprob:
                         assert extend_logprob_start_len_per_req is not None
@@ -184,10 +184,10 @@ class SchedulerOutputProcessorMixin:
                     req.output_ids.append(0)
                     req.check_finished()
 
-                    if req.finished():
-                        self.tree_cache.cache_finished_req(req)
-                    else:
-                        self.tree_cache.cache_unfinished_req(req)
+                    # if req.finished():
+                    #    self.tree_cache.cache_finished_req(req)
+                    # else:
+                    #    self.tree_cache.cache_unfinished_req(req)
                 else:
                     # being chunked reqs' prefill is not finished
                     req.is_chunked -= 1
@@ -245,6 +245,7 @@ class SchedulerOutputProcessorMixin:
             if req.is_retracted:
                 continue
 
+            """
             if self.enable_overlap and req.finished():
                 # Free the one extra delayed token
                 if self.page_size == 1:
@@ -258,6 +259,7 @@ class SchedulerOutputProcessorMixin:
                             batch.out_cache_loc[i : i + 1]
                         )
                 continue
+            """
 
             if batch.spec_algorithm.is_none():
                 # speculative worker will solve the output_ids in speculative decoding
@@ -267,8 +269,9 @@ class SchedulerOutputProcessorMixin:
 
             req.check_finished()
             if req.finished():
-                self.tree_cache.cache_finished_req(req)
-                req.time_stats.completion_time = time.time()
+                pass
+                # self.tree_cache.cache_finished_req(req)
+                # req.time_stats.completion_time = time.time()
 
             if req.return_logprob and batch.spec_algorithm.is_none():
                 # speculative worker handles logprob in speculative decoding

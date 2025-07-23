@@ -1033,6 +1033,7 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
             return out_cache_loc
 
     def allocate_for_eagle(self):
+        return
         from sglang.srt.speculative.eagle_utils import assign_req_to_token_pool
 
         worker = self.draft_worker
@@ -1322,6 +1323,17 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
                 out_cache_loc,
                 self.req_to_token_pool.req_to_token.shape[1],
             )
+            self.req_to_token_pool.req_to_token[req_pool_indices_tensor[0], :] = (
+                torch.arange(
+                    1,
+                    self.req_to_token_pool.req_to_token.shape[1] + 1,
+                    device=self.device,
+                )
+            )
+            self.out_cache_loc = torch.arange(
+                1, self.out_cache_loc.shape[0] + 1, device=self.device
+            )
+            print(f"{req_pool_indices_tensor=}")
         else:
             pt = 0
             for i in range(bs):
@@ -1539,6 +1551,11 @@ class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
         )
 
     def prepare_for_decode(self):
+        assert torch.all(
+            self.req_to_token_pool.req_to_token[self.req_pool_indices[0], :2000]
+            == torch.arange(1, 2001, device=self.device)
+        ), f"{self.req_to_token_pool.req_to_token[1, :2000]=}"
+
         self.forward_mode = ForwardMode.DECODE
         bs = len(self.reqs)
 

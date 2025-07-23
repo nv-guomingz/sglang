@@ -381,7 +381,8 @@ class EAGLEWorker(TpModelWorker):
 
         # Batch 1: Target verify
         # Prepare for target verify in a separate stream
-        with self.plan_stream_ctx:
+        # with self.plan_stream_ctx:
+        if True:
             verify_forward_batch, can_run_cuda_graph = spec_info.prepare_for_verify(
                 batch, self.target_worker
             )
@@ -518,7 +519,7 @@ class EAGLEWorker(TpModelWorker):
             hidden_states=target_hidden_states,
             verified_id=next_token_ids,
             new_seq_lens=batch.seq_lens,
-            allocate_lens=batch.seq_lens,
+            allocate_lens=batch.seq_lens.clone(),
         )
         batch.spec_info = draft_input
 
